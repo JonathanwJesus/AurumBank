@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transações - Aurum Bank</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #ffd700;
+            --success: #4caf50;
+            --danger: #f44336;
+            --background: #f8f9fa;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--background);
+            display: flex;
+            transition: all 0.3s ease;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar.collapsed .logo h1,
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+        
+        .logo {
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid #283593;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            transition: opacity 0.3s;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item:hover {
+            background: #283593;
+        }
+        
+        .menu-item.active {
+            background: #283593;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+            width: calc(100% - var(--sidebar-collapsed-width));
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+        
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .page-title {
+            color: #333;
+        }
+        
+        .page-description {
+            color: #666;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Search and Filters */
+        .search-filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: 2fr repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        select, input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
+        }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        th:hover {
+            background: #e9ecef;
+        }
+        
+        th.sortable::after {
+            content: '↕';
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        th.sorted-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+        
+        th.sorted-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .positive {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        .type-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .type-receita {
+            background: #e8f5e8;
+            color: var(--success);
+        }
+        
+        .type-despesa {
+            background: #ffebee;
+            color: var(--danger);
+        }
+        
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .summary-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification.info {
+            background: var(--primary);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            .sidebar .logo h1,
+            .sidebar .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+                width: calc(100% - var(--sidebar-collapsed-width));
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-menu {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.active .logo h1,
+            .sidebar.active .menu-item span {
+                display: block;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .summary-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+
+   <!-- Sistema de Navegação -->
+    <link rel="stylesheet" href="navigation.css">
+    <script src="navigation.js"></script>
+
+</head>
+<body>
+    <!-- Overlay for mobile menu -->
+    <div class="overlay"></div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Aur<span>um</span> Bank</h1>
+            <button class="menu-toggle">☰</button>
+        </div>
+        
+        <div class="menu">
+            <div class="menu-item" data-page="dashboard">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item" data-page="accounts">
+                <span>💳</span>
+                <span>Contas</span>
+            </div>
+            <div class="menu-item active" data-page="transactions">
+                <span>💸</span>
+                <span>Transações</span>
+            </div>
+            <div class="menu-item" data-page="reports">
+                <span>📊</span>
+                <span>Relatórios</span>
+            </div>
+            <div class="menu-item" data-page="settings">
+                <span>⚙️</span>
+                <span>Configurações</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2>Transações</h2>
+            <div class="user-menu">
+                <span>Olá, João Silva</span>
+                <button class="logout-btn">Sair</button>
+            </div>
+        </div>
+        
+        <div class="page-header">
+            <div>
+                <h3 class="page-title">Histórico de Transações</h3>
+                <p class="page-description">Visualize todas as suas transações financeiras registradas</p>
+            </div>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-label">Total de Receitas</div>
+                <div class="summary-value positive">R$ 6.200,00</div>
+                <div class="summary-label">Últimos 30 dias</div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-label">Total de Despesas</div>
+                <div class="summary-value negative">R$ 3.856,90</div>
+                <div class="summary-label">Últimos 30 dias</div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-label">Saldo Líquido</div>
+                <div class="summary-value positive">R$ 2.343,10</div>
+                <div class="summary-label">Últimos 30 dias</div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-label">Transações</div>
+                <div class="summary-value">24</div>
+                <div class="summary-label">Este mês</div>
+            </div>
+        </div>
+        
+        <!-- Search and Filters -->
+        <div class="search-filters">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-transactions" placeholder="Buscar transações...">
+            </div>
+            
+            <div class="filter-group">
+                <label>Período</label>
+                <select id="period-filter">
+                    <option value="30">Últimos 30 dias</option>
+                    <option value="90" selected>Últimos 3 meses</option>
+                    <option value="180">Últimos 6 meses</option>
+                    <option value="365">Último ano</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Categoria</label>
+                <select id="category-filter">
+                    <option value="">Todas</option>
+                    <option value="alimentacao">Alimentação</option>
+                    <option value="transporte">Transporte</option>
+                    <option value="saude">Saúde</option>
+                    <option value="educacao">Educação</option>
+                    <option value="lazer">Lazer</option>
+                    <option value="rendimento">Rendimento</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Tipo</label>
+                <select id="type-filter">
+                    <option value="">Todos</option>
+                    <option value="receita">Receitas</option>
+                    <option value="despesa">Despesas</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Tabela de Transações -->
+        <div class="table-container">
+            <table id="transactions-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="date">Data</th>
+                        <th class="sortable" data-sort="description">Descrição</th>
+                        <th class="sortable" data-sort="category">Categoria</th>
+                        <th class="sortable" data-sort="type">Tipo</th>
+                        <th class="sortable" data-sort="amount">Valor</th>
+                        <th class="sortable" data-sort="account">Conta</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-body">
+                    <tr>
+                        <td>15/01/2024</td>
+                        <td>Supermercado</td>
+                        <td>Alimentação</td>
+                        <td><span class="type-badge type-despesa">Despesa</span></td>
+                        <td class="negative">-R$ 256,90</td>
+                        <td>Cartão de Crédito</td>
+                    </tr>
+                    <tr>
+                        <td>14/01/2024</td>
+                        <td>Salário</td>
+                        <td>Rendimento</td>
+                        <td><span class="type-badge type-receita">Receita</span></td>
+                        <td class="positive">+R$ 5.000,00</td>
+                        <td>Conta Corrente</td>
+                    </tr>
+                    <tr>
+                        <td>12/01/2024</td>
+                        <td>Academia</td>
+                        <td>Saúde</td>
+                        <td><span class="type-badge type-despesa">Despesa</span></td>
+                        <td class="negative">-R$ 89,90</td>
+                        <td>Conta Corrente</td>
+                    </tr>
+                    <tr>
+                        <td>10/01/2024</td>
+                        <td>Freelance</td>
+                        <td>Rendimento</td>
+                        <td><span class="type-badge type-receita">Receita</span></td>
+                        <td class="positive">+R$ 1.200,00</td>
+                        <td>Poupança</td>
+                    </tr>
+                    <tr>
+                        <td>08/01/2024</td>
+                        <td>Aluguel</td>
+                        <td>Moradia</td>
+                        <td><span class="type-badge type-despesa">Despesa</span></td>
+                        <td class="negative">-R$ 1.200,00</td>
+                        <td>Conta Corrente</td>
+                    </tr>
+                    <tr>
+                        <td>05/01/2024</td>
+                        <td>Combustível</td>
+                        <td>Transporte</td>
+                        <td><span class="type-badge type-despesa">Despesa</span></td>
+                        <td class="negative">-R$ 180,00</td>
+                        <td>Cartão de Crédito</td>
+                    </tr>
+                    <tr>
+                        <td>03/01/2024</td>
+                        <td>Restaurante</td>
+                        <td>Alimentação</td>
+                        <td><span class="type-badge type-despesa">Despesa</span></td>
+                        <td class="negative">-R$ 85,50</td>
+                        <td>Cartão de Crédito</td>
+                    </tr>
+                    <tr>
+                        <td>02/01/2024</td>
+                        <td>Investimento</td>
+                        <td>Rendimento</td>
+                        <td><span class="type-badge type-receita">Receita</span></td>
+                        <td class="positive">+R$ 320,00</td>
+                        <td>Investimentos</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Empty State (hidden by default) -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <h3>Nenhuma transação encontrada</h3>
+            <p>Não há transações correspondentes aos filtros aplicados.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Menu toggle functionality
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const overlay = document.querySelector('.overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            // Menu navigation
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all menu items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked menu item
+                    this.classList.add('active');
+                    
+                    // In a real application, you would navigate to the selected page
+                    const page = this.getAttribute('data-page');
+                    if (page !== 'transactions') {
+                        alert(`Navegando para a página: ${page}`);
+                        // window.location.href = `${page}.html`;
+                    }
+                    
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Logout button functionality
+            const logoutBtn = document.querySelector('.logout-btn');
+            
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja sair?')) {
+                    alert('Você foi desconectado com sucesso!');
+                    // In a real application, you would redirect to login page
+                    // window.location.href = 'login.html';
+                }
+            });
+            
+            // Table sorting functionality
+            const tableHeaders = document.querySelectorAll('th.sortable');
+            let currentSort = { column: 'date', direction: 'asc' };
+            
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.getAttribute('data-sort');
+                    
+                    // Remove previous sort indicators
+                    tableHeaders.forEach(h => {
+                        h.classList.remove('sorted-asc', 'sorted-desc');
+                    });
+                    
+                    // Toggle sort direction if same column
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = 'asc';
+                    }
+                    
+                    // Add sort indicator
+                    this.classList.add(currentSort.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                    
+                    // Sort table
+                    sortTable(column, currentSort.direction);
+                    showNotification(`Tabela ordenada por ${getColumnName(column)} (${currentSort.direction === 'asc' ? 'crescente' : 'decrescente'})`, 'info');
+                });
+            });
+            
+            function sortTable(column, direction) {
+                const table = document.getElementById('transactions-table');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                
+                rows.sort((a, b) => {
+                    const aValue = a.cells[getColumnIndex(column)].textContent;
+                    const bValue = b.cells[getColumnIndex(column)].textContent;
+                    
+                    let comparison = 0;
+                    
+                    if (column === 'amount') {
+                        // Sort by numeric value for amounts
+                        const aNum = parseFloat(aValue.replace('R$', '').replace('.', '').replace(',', '.').replace('+', '').replace('-', ''));
+                        const bNum = parseFloat(bValue.replace('R$', '').replace('.', '').replace(',', '.').replace('+', '').replace('-', ''));
+                        
+                        // Consider negative values for expenses
+                        const aIsNegative = aValue.includes('-');
+                        const bIsNegative = bValue.includes('-');
+                        
+                        const aFinal = aIsNegative ? -aNum : aNum;
+                        const bFinal = bIsNegative ? -bNum : bNum;
+                        
+                        comparison = aFinal - bFinal;
+                    } else if (column === 'date') {
+                        // Sort by date
+                        const [aDay, aMonth, aYear] = aValue.split('/');
+                        const [bDay, bMonth, bYear] = bValue.split('/');
+                        const aDate = new Date(aYear, aMonth - 1, aDay);
+                        const bDate = new Date(bYear, bMonth - 1, bDay);
+                        comparison = aDate - bDate;
+                    } else {
+                        // Sort by text
+                        comparison = aValue.localeCompare(bValue);
+                    }
+                    
+                    return direction === 'asc' ? comparison : -comparison;
+                });
+                
+                // Remove existing rows
+                while (tbody.firstChild) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+                
+                // Add sorted rows
+                rows.forEach(row => tbody.appendChild(row));
+            }
+            
+            function getColumnIndex(column) {
+                const headers = document.querySelectorAll('th');
+                for (let i = 0; i < headers.length; i++) {
+                    if (headers[i].getAttribute('data-sort') === column) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+            
+            function getColumnName(column) {
+                const names = {
+                    'date': 'Data',
+                    'description': 'Descrição',
+                    'category': 'Categoria',
+                    'type': 'Tipo',
+                    'amount': 'Valor',
+                    'account': 'Conta'
+                };
+                return names[column] || column;
+            }
+            
+            // Search and filter functionality
+            const searchInput = document.getElementById('search-transactions');
+            const periodFilter = document.getElementById('period-filter');
+            const categoryFilter = document.getElementById('category-filter');
+            const typeFilter = document.getElementById('type-filter');
+            const transactionsBody = document.getElementById('transactions-body');
+            const emptyState = document.getElementById('empty-state');
+            
+            function filterTransactions() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const periodValue = periodFilter.value;
+                const categoryValue = categoryFilter.value;
+                const typeValue = typeFilter.value;
+                
+                const transactions = transactionsBody.querySelectorAll('tr');
+                let visibleCount = 0;
+                
+                transactions.forEach(transaction => {
+                    const description = transaction.cells[1].textContent.toLowerCase();
+                    const category = transaction.cells[2].textContent.toLowerCase();
+                    const type = transaction.cells[3].textContent.toLowerCase();
+                    
+                    const matchesSearch = description.includes(searchTerm);
+                    const matchesCategory = !categoryValue || category.includes(categoryValue);
+                    const matchesType = !typeValue || 
+                        (typeValue === 'receita' && type.includes('receita')) ||
+                        (typeValue === 'despesa' && type.includes('despesa'));
+                    
+                    if (matchesSearch && matchesCategory && matchesType) {
+                        transaction.style.display = '';
+                        visibleCount++;
+                    } else {
+                        transaction.style.display = 'none';
+                    }
+                });
+                
+                checkEmptyState(visibleCount);
+            }
+            
+            function checkEmptyState(visibleCount) {
+                const transactions = transactionsBody.querySelectorAll('tr');
+                const actualVisibleCount = visibleCount !== undefined ? 
+                    visibleCount : 
+                    Array.from(transactions).filter(tr => tr.style.display !== 'none').length;
+                
+                if (actualVisibleCount === 0) {
+                    emptyState.style.display = 'block';
+                    document.querySelector('.table-container').style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    document.querySelector('.table-container').style.display = 'block';
+                }
+            }
+            
+            searchInput.addEventListener('input', filterTransactions);
+            periodFilter.addEventListener('change', filterTransactions);
+            categoryFilter.addEventListener('change', filterTransactions);
+            typeFilter.addEventListener('change', filterTransactions);
+            
+            // Notification function
+            function showNotification(message, type) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Responsive adjustments
+            function handleResize() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+        });
+    </script>
+</body>
+</html>

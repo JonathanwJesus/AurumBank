@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Aurum Bank</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #ffd700;
+            --success: #4caf50;
+            --danger: #f44336;
+            --background: #f8f9fa;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--background);
+            display: flex;
+            transition: all 0.3s ease;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar.collapsed .logo h1,
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+        
+        .logo {
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid #283593;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            transition: opacity 0.3s;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item:hover {
+            background: #283593;
+        }
+        
+        .menu-item.active {
+            background: #283593;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+            width: calc(100% - var(--sidebar-collapsed-width));
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+        
+        /* Estilos específicos para Relatórios */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        select, input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-export {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-export:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-export:active {
+            transform: scale(0.98);
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chart-card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chart-btn {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .chart-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .chart-placeholder {
+            background: #f8f9fa;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            color: #666;
+            font-size: 1.1rem;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-simulation {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 1rem;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s ease;
+        }
+        
+        .chart-bar.negative {
+            background: var(--danger);
+        }
+        
+        .chart-bar.positive {
+            background: var(--success);
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-positive {
+            color: var(--success);
+        }
+        
+        .stat-negative {
+            color: var(--danger);
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            left: 0;
+        }
+        
+        .positive {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.info {
+            background: var(--primary);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .full-width {
+                grid-column: 1;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            .sidebar .logo h1,
+            .sidebar .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+                width: calc(100% - var(--sidebar-collapsed-width));
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-menu {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.active .logo h1,
+            .sidebar.active .menu-item span {
+                display: block;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-buttons {
+                justify-content: center;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-actions {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .chart-placeholder {
+                height: 250px;
+                font-size: 1rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .btn-export {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+
+   <!-- Sistema de Navegação -->
+    <link rel="stylesheet" href="navigation.css">
+    <script src="navigation.js"></script>
+
+</head>
+<body>
+    <!-- Overlay for mobile menu -->
+    <div class="overlay"></div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Aur<span>um</span> Bank</h1>
+            <button class="menu-toggle">☰</button>
+        </div>
+        
+        <div class="menu">
+            <div class="menu-item" data-page="dashboard">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item" data-page="accounts">
+                <span>💳</span>
+                <span>Contas</span>
+            </div>
+            <div class="menu-item" data-page="transactions">
+                <span>💸</span>
+                <span>Transações</span>
+            </div>
+            <div class="menu-item active" data-page="reports">
+                <span>📊</span>
+                <span>Relatórios</span>
+            </div>
+            <div class="menu-item" data-page="settings">
+                <span>⚙️</span>
+                <span>Configurações</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2>Relatórios Financeiros</h2>
+            <div class="user-menu">
+                <span>Olá, João Silva</span>
+                <button class="logout-btn">Sair</button>
+            </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Período</label>
+                <select id="period-filter">
+                    <option value="30">Últimos 30 dias</option>
+                    <option value="90" selected>Últimos 3 meses</option>
+                    <option value="180">Últimos 6 meses</option>
+                    <option value="365">Último ano</option>
+                    <option value="custom">Personalizado</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Conta</label>
+                <select id="account-filter">
+                    <option value="">Todas as contas</option>
+                    <option value="corrente">Conta Corrente</option>
+                    <option value="poupanca">Poupança</option>
+                    <option value="carteira">Carteira</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Categoria</label>
+                <select id="category-filter">
+                    <option value="">Todas as categorias</option>
+                    <option value="alimentacao">Alimentação</option>
+                    <option value="transporte">Transporte</option>
+                    <option value="saude">Saúde</option>
+                    <option value="educacao">Educação</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Tipo</label>
+                <select id="type-filter">
+                    <option value="">Todos</option>
+                    <option value="receita">Receitas</option>
+                    <option value="despesa">Despesas</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Botões de Exportação -->
+        <div class="export-buttons">
+            <button class="btn-export" id="export-pdf">
+                📄 Exportar PDF
+            </button>
+            <button class="btn-export" id="export-excel">
+                📊 Exportar Excel
+            </button>
+            <button class="btn-export" id="export-csv">
+                📋 Exportar CSV
+            </button>
+        </div>
+        
+        <!-- Cards de Estatísticas -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-label">Receitas Totais</div>
+                <div class="stat-value stat-positive">R$ 6.200,00</div>
+                <div class="stat-label">+12% vs mês anterior</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Despesas Totais</div>
+                <div class="stat-value stat-negative">R$ 3.856,90</div>
+                <div class="stat-label">-5% vs mês anterior</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Saldo Líquido</div>
+                <div class="stat-value stat-positive">R$ 2.343,10</div>
+                <div class="stat-label">+25% vs mês anterior</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Maior Despesa</div>
+                <div class="stat-value stat-negative">R$ 1.200,00</div>
+                <div class="stat-label">Aluguel</div>
+            </div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>
+                    Distribuição por Categoria
+                    <div class="chart-actions">
+                        <button class="chart-btn active" data-chart="pie">Pizza</button>
+                        <button class="chart-btn" data-chart="bar">Barras</button>
+                    </div>
+                </h3>
+                <div class="chart-placeholder" id="category-chart">
+                    <div class="chart-simulation">
+                        <div class="chart-bar positive" style="height: 70%;" title="Alimentação: 25%"></div>
+                        <div class="chart-bar positive" style="height: 60%;" title="Transporte: 20%"></div>
+                        <div class="chart-bar positive" style="height: 50%;" title="Saúde: 15%"></div>
+                        <div class="chart-bar positive" style="height: 40%;" title="Lazer: 10%"></div>
+                        <div class="chart-bar positive" style="height: 30%;" title="Outros: 30%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <h3>
+                    Evolução Mensal
+                    <div class="chart-actions">
+                        <button class="chart-btn active" data-chart="line">Linha</button>
+                        <button class="chart-btn" data-chart="area">Área</button>
+                    </div>
+                </h3>
+                <div class="chart-placeholder" id="evolution-chart">
+                    <div class="chart-simulation">
+                        <div class="chart-bar positive" style="height: 40%;"></div>
+                        <div class="chart-bar positive" style="height: 50%;"></div>
+                        <div class="chart-bar positive" style="height: 60%;"></div>
+                        <div class="chart-bar positive" style="height: 70%;"></div>
+                        <div class="chart-bar positive" style="height: 80%;"></div>
+                        <div class="chart-bar positive" style="height: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-card full-width">
+                <h3>
+                    Comparativo Receitas vs Despesas
+                    <div class="chart-actions">
+                        <button class="chart-btn active" data-chart="stacked">Empilhado</button>
+                        <button class="chart-btn" data-chart="grouped">Agrupado</button>
+                    </div>
+                </h3>
+                <div class="chart-placeholder" id="comparison-chart">
+                    <div class="chart-simulation">
+                        <div class="chart-bar positive" style="height: 70%;"></div>
+                        <div class="chart-bar negative" style="height: 40%;"></div>
+                        <div class="chart-bar positive" style="height: 75%;"></div>
+                        <div class="chart-bar negative" style="height: 45%;"></div>
+                        <div class="chart-bar positive" style="height: 80%;"></div>
+                        <div class="chart-bar negative" style="height: 50%;"></div>
+                        <div class="chart-bar positive" style="height: 85%;"></div>
+                        <div class="chart-bar negative" style="height: 55%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabela Detalhada -->
+        <div class="chart-card">
+            <h3>Detalhamento por Categoria</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Receitas</th>
+                            <th>Despesas</th>
+                            <th>Saldo</th>
+                            <th>% do Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alimentação</td>
+                            <td>R$ 0,00</td>
+                            <td>R$ 856,90</td>
+                            <td class="negative">-R$ 856,90</td>
+                            <td>22%</td>
+                        </tr>
+                        <tr>
+                            <td>Transporte</td>
+                            <td>R$ 0,00</td>
+                            <td>R$ 420,00</td>
+                            <td class="negative">-R$ 420,00</td>
+                            <td>11%</td>
+                        </tr>
+                        <tr>
+                            <td>Rendimento</td>
+                            <td>R$ 6.200,00</td>
+                            <td>R$ 0,00</td>
+                            <td class="positive">+R$ 6.200,00</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td>Moradia</td>
+                            <td>R$ 0,00</td>
+                            <td>R$ 1.200,00</td>
+                            <td class="negative">-R$ 1.200,00</td>
+                            <td>31%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Menu toggle functionality
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const overlay = document.querySelector('.overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            // Menu navigation
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all menu items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked menu item
+                    this.classList.add('active');
+                    
+                    // In a real application, you would navigate to the selected page
+                    const page = this.getAttribute('data-page');
+                    if (page !== 'reports') {
+                        alert(`Navegando para a página: ${page}`);
+                        // window.location.href = `${page}.html`;
+                    }
+                    
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Logout button functionality
+            const logoutBtn = document.querySelector('.logout-btn');
+            
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja sair?')) {
+                    alert('Você foi desconectado com sucesso!');
+                    // In a real application, you would redirect to login page
+                    // window.location.href = 'login.html';
+                }
+            });
+            
+            // Filter functionality
+            const filters = document.querySelectorAll('.filters select');
+            
+            filters.forEach(filter => {
+                filter.addEventListener('change', function() {
+                    // Show loading state
+                    showNotification('Aplicando filtros...', 'info');
+                    
+                    // Simulate API call delay
+                    setTimeout(() => {
+                        updateCharts();
+                        showNotification('Filtros aplicados com sucesso!', 'success');
+                    }, 1000);
+                });
+            });
+            
+            // Export buttons
+            const exportPdf = document.getElementById('export-pdf');
+            const exportExcel = document.getElementById('export-excel');
+            const exportCsv = document.getElementById('export-csv');
+            
+            exportPdf.addEventListener('click', function() {
+                simulateExport('PDF');
+            });
+            
+            exportExcel.addEventListener('click', function() {
+                simulateExport('Excel');
+            });
+            
+            exportCsv.addEventListener('click', function() {
+                simulateExport('CSV');
+            });
+            
+            function simulateExport(format) {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = `<span class="loading"></span>Exportando ${format}...`;
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showNotification(`Relatório exportado em ${format} com sucesso!`, 'success');
+                }, 2000);
+            }
+            
+            // Chart type toggles
+            const chartButtons = document.querySelectorAll('.chart-btn');
+            
+            chartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    const buttons = parent.querySelectorAll('.chart-btn');
+                    
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, you would update the chart type here
+                    const chartType = this.getAttribute('data-chart');
+                    showNotification(`Gráfico alterado para: ${chartType}`, 'info');
+                });
+            });
+            
+            // Update charts based on filters
+            function updateCharts() {
+                // In a real app, you would fetch new data and update charts
+                // For demo purposes, we'll just animate the chart bars
+                const bars = document.querySelectorAll('.chart-bar');
+                
+                bars.forEach(bar => {
+                    const randomHeight = Math.floor(Math.random() * 50) + 30;
+                    bar.style.height = `${randomHeight}%`;
+                });
+            }
+            
+            // Initialize chart animations
+            function initChartAnimations() {
+                const bars = document.querySelectorAll('.chart-bar');
+                
+                bars.forEach(bar => {
+                    // Set initial height to 0
+                    const finalHeight = bar.style.height;
+                    bar.style.height = '0%';
+                    
+                    // Animate to final height
+                    setTimeout(() => {
+                        bar.style.height = finalHeight;
+                    }, 300);
+                });
+            }
+            
+            // Notification function
+            function showNotification(message, type) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Responsive adjustments
+            function handleResize() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+            
+            // Initialize chart animations on load
+            setTimeout(initChartAnimations, 500);
+        });
+    </script>
+</body>
+</html>

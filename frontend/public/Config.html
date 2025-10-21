@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Aurum Bank</title>
+    <style>
+        /* Estilos base (iguais aos anteriores) */
+        :root {
+            --primary: #1a237e;
+            --secondary: #ffd700;
+            --success: #4caf50;
+            --danger: #f44336;
+            --background: #f8f9fa;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--background);
+            display: flex;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar.collapsed .logo h1,
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+        
+        .logo {
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid #283593;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            transition: opacity 0.3s;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item:hover {
+            background: #283593;
+        }
+        
+        .menu-item.active {
+            background: #283593;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+            width: calc(100% - var(--sidebar-collapsed-width));
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+        
+        /* Estilos específicos para Configurações */
+        .settings-container {
+            max-width: 800px;
+        }
+        
+        .settings-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .settings-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .settings-section h3 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .theme-selector {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .theme-option {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-option:hover {
+            border-color: var(--primary);
+        }
+        
+        .theme-option.active {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+        
+        .theme-preview {
+            width: 60px;
+            height: 30px;
+            border-radius: 4px;
+            margin: 0 auto 0.5rem;
+        }
+        
+        .theme-light {
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border: 1px solid #ddd;
+        }
+        
+        .theme-dark {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+        }
+        
+        .theme-auto {
+            background: linear-gradient(90deg, #ffffff 50%, #2d3748 50%);
+            border: 1px solid #ddd;
+        }
+        
+        .currency-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .currency-option {
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .currency-option:hover {
+            border-color: var(--primary);
+        }
+        
+        .currency-option.active {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+        
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .btn-save:hover {
+            background: #283593;
+        }
+        
+        .actions-bar {
+            text-align: right;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .password-toggle {
+            position: relative;
+        }
+        
+        .password-toggle input {
+            padding-right: 3rem;
+        }
+        
+        .toggle-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            .sidebar .logo h1,
+            .sidebar .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+                width: calc(100% - var(--sidebar-collapsed-width));
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-menu {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.active .logo h1,
+            .sidebar.active .menu-item span {
+                display: block;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-selector {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .settings-section {
+                padding: 1.5rem;
+            }
+            
+            .currency-options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+    
+    <!-- Sistema de Navegação -->
+    <link rel="stylesheet" href="navigation.css">
+    <script src="navigation.js"></script>
+
+</head>
+
+
+<body>
+    <!-- Overlay for mobile menu -->
+    <div class="overlay"></div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Aur<span>um</span> Bank</h1>
+            <button class="menu-toggle">☰</button>
+        </div>
+        
+        <div class="menu">
+            <div class="menu-item" data-page="dashboard">
+                <span>📊</span>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item" data-page="accounts">
+                <span>💳</span>
+                <span>Contas</span>
+            </div>
+            <div class="menu-item" data-page="transactions">
+                <span>💸</span>
+                <span>Transações</span>
+            </div>
+            <div class="menu-item" data-page="reports">
+                <span>📊</span>
+                <span>Relatórios</span>
+            </div>
+            <div class="menu-item active" data-page="settings">
+                <span>⚙️</span>
+                <span>Configurações</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h2>Configurações</h2>
+            <div class="user-menu">
+                <span>Olá, João Silva</span>
+                <button class="logout-btn">Sair</button>
+            </div>
+        </div>
+        
+        <div class="settings-container">
+            <!-- Dados Pessoais -->
+            <div class="settings-section">
+                <h3>👤 Dados Pessoais</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo</label>
+                        <input type="text" id="nome" value="João Silva">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" value="joao.silva@email.com">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" value="(11) 99999-9999">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="data-nascimento">Data de Nascimento</label>
+                        <input type="date" id="data-nascimento" value="1985-05-15">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Segurança -->
+            <div class="settings-section">
+                <h3>🔒 Segurança</h3>
+                
+                <div class="form-group">
+                    <label for="senha-atual">Senha Atual</label>
+                    <div class="password-toggle">
+                        <input type="password" id="senha-atual" placeholder="Digite sua senha atual">
+                        <button class="toggle-icon" data-target="senha-atual">👁️</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nova-senha">Nova Senha</label>
+                    <div class="password-toggle">
+                        <input type="password" id="nova-senha" placeholder="Digite a nova senha">
+                        <button class="toggle-icon" data-target="nova-senha">👁️</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmar-senha">Confirmar Nova Senha</label>
+                    <div class="password-toggle">
+                        <input type="password" id="confirmar-senha" placeholder="Confirme a nova senha">
+                        <button class="toggle-icon" data-target="confirmar-senha">👁️</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preferências -->
+            <div class="settings-section">
+                <h3>🎨 Preferências</h3>
+                
+                <div class="form-group">
+                    <label>Tema</label>
+                    <div class="theme-selector">
+                        <div class="theme-option active" data-theme="light">
+                            <div class="theme-preview theme-light"></div>
+                            <span>Claro</span>
+                        </div>
+                        <div class="theme-option" data-theme="dark">
+                            <div class="theme-preview theme-dark"></div>
+                            <span>Escuro</span>
+                        </div>
+                        <div class="theme-option" data-theme="auto">
+                            <div class="theme-preview theme-auto"></div>
+                            <span>Automático</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Moeda Principal</label>
+                    <div class="currency-options">
+                        <div class="currency-option active" data-currency="BRL">
+                            <span>R$ BRL</span>
+                        </div>
+                        <div class="currency-option" data-currency="USD">
+                            <span>$ USD</span>
+                        </div>
+                        <div class="currency-option" data-currency="EUR">
+                            <span>€ EUR</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="idioma">Idioma</label>
+                    <select id="idioma">
+                        <option value="pt-BR" selected>Português (Brasil)</option>
+                        <option value="en-US">English (US)</option>
+                        <option value="es-ES">Español</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Notificações -->
+            <div class="settings-section">
+                <h3>🔔 Notificações</h3>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notificacao-email" checked>
+                        Receber notificações por e-mail
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notificacao-sms" checked>
+                        Receber notificações por SMS
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="notificacao-push">
+                        Receber notificações push
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Ações -->
+            <div class="actions-bar">
+                <button class="btn-save" id="btn-salvar">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Menu toggle functionality
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const overlay = document.querySelector('.overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            // Menu navigation
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all menu items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked menu item
+                    this.classList.add('active');
+                    
+                    // In a real application, you would navigate to the selected page
+                    const page = this.getAttribute('data-page');
+                    if (page !== 'settings') {
+                        alert(`Navegando para a página: ${page}`);
+                        // window.location.href = `${page}.html`;
+                    }
+                    
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Logout button functionality
+            const logoutBtn = document.querySelector('.logout-btn');
+            
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja sair?')) {
+                    alert('Você foi desconectado com sucesso!');
+                    // In a real application, you would redirect to login page
+                    // window.location.href = 'login.html';
+                }
+            });
+            
+            // Theme selector
+            const themeOptions = document.querySelectorAll('.theme-option');
+            
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    themeOptions.forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const theme = this.getAttribute('data-theme');
+                    showNotification(`Tema alterado para: ${theme}`, 'success');
+                });
+            });
+            
+            // Currency selector
+            const currencyOptions = document.querySelectorAll('.currency-option');
+            
+            currencyOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    currencyOptions.forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const currency = this.getAttribute('data-currency');
+                    showNotification(`Moeda principal alterada para: ${currency}`, 'success');
+                });
+            });
+            
+            // Password toggle
+            const toggleIcons = document.querySelectorAll('.toggle-icon');
+            
+            toggleIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.textContent = '🙈';
+                    } else {
+                        input.type = 'password';
+                        this.textContent = '👁️';
+                    }
+                });
+            });
+            
+            // Save button
+            const saveBtn = document.getElementById('btn-salvar');
+            
+            saveBtn.addEventListener('click', function() {
+                // Validate passwords
+                const novaSenha = document.getElementById('nova-senha').value;
+                const confirmarSenha = document.getElementById('confirmar-senha').value;
+                
+                if (novaSenha && novaSenha !== confirmarSenha) {
+                    showNotification('As senhas não coincidem!', 'error');
+                    return;
+                }
+                
+                // Simulate saving
+                this.textContent = 'Salvando...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.textContent = 'Salvar Alterações';
+                    this.disabled = false;
+                    showNotification('Configurações salvas com sucesso!', 'success');
+                }, 1500);
+            });
+            
+            // Notification function
+            function showNotification(message, type) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Responsive adjustments
+            function handleResize() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+        });
+    </script>
+</body>
+</html>
