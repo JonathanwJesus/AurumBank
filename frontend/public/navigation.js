@@ -1,228 +1,177 @@
-// Sistema de Navegação SPA - Versão Corrigida
-class NavigationSystem {
-    constructor() {
-        this.pages = {
-            'dashboard': 'Dashboard.html',
-            'accounts': 'Conta.html', 
-            'transactions': 'Transisao.html',
-            'reports': 'Relatorio.html',
-            'settings': 'Config.html'
-        };
-        this.currentPage = 'dashboard';
-        this.init();
-    }
+// Sistema de Navegação Aurum Bank - Versão Corrigida e Funcional
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Iniciando sistema de navegação...');
     
-    init() {
-        this.setupMenuListeners();
-        // Não carregar a página inicial automaticamente
-        // pois ela já está carregada
-    }
-    
-    setupMenuListeners() {
-        const menuItems = document.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
+    // Mapeamento das páginas
+    const pageMap = {
+        'dashboard': 'Dashboard.html',
+        'accounts': 'Conta.html',
+        'transactions': 'Transisao.html', 
+        'reports': 'Relatorio.html',
+        'settings': 'Config.html'
+    };
+
+    // 1. Configurar clicks no menu
+    function setupMenuListeners() {
+        const menuItems = document.querySelectorAll('.menu-item[data-page]');
+        console.log('📝 Configurando ' + menuItems.length + ' itens de menu');
+        
+        menuItems.forEach(function(item) {
+            // Remover event listeners antigos
+            var newItem = item.cloneNode(true);
+            item.parentNode.replaceChild(newItem, item);
+            
+            // Adicionar novo listener
+            newItem.addEventListener('click', function(e) {
                 e.preventDefault();
-                const page = item.getAttribute('data-page');
-                this.navigateTo(page);
+                e.stopPropagation();
+                
+                var page = this.getAttribute('data-page');
+                console.log('🔗 Navegando para: ' + page);
+                
+                if (pageMap[page]) {
+                    showLoading();
+                    
+                    // Navegação tradicional
+                    setTimeout(function() {
+                        window.location.href = pageMap[page];
+                    }, 400);
+                }
             });
         });
     }
-    
-    navigateTo(page) {
-        if (this.pages[page] && page !== this.currentPage) {
-            this.currentPage = page;
-            this.loadPage(page);
-            this.updateActiveMenu(page);
-        }
-    }
-    
-    async loadPage(page) {
-        try {
-            this.showLoading();
-            
-            // Fazer a requisição para a página
-            const response = await fetch(this.pages[page]);
-            const html = await response.text();
-            
-            // Extrair o conteúdo completo da página
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Extrair e injetar os estilos da página
-            this.injectPageStyles(doc);
-            
-            // Extrair e injetar o conteúdo principal
-            const mainContent = doc.querySelector('.main-content');
-            if (mainContent) {
-                document.querySelector('.main-content').innerHTML = mainContent.innerHTML;
-            }
-            
-            // Atualizar o título da página
-            document.title = doc.title;
-            
-            // Reaplicar scripts
-            this.reapplyScripts(page);
-            
-            this.hideLoading();
-            
-        } catch (error) {
-            console.error('Erro ao carregar página:', error);
-            this.hideLoading();
-            // Fallback: redirecionamento tradicional
-            window.location.href = this.pages[page];
-        }
-    }
-    
-    injectPageStyles(doc) {
-        // Encontrar todos os estilos da página carregada
-        const styles = doc.querySelectorAll('style');
-        const existingStyleIds = new Set();
+
+    // 2. Atualizar menu ativo
+    function updateActiveMenu() {
+        var currentPath = window.location.pathname;
+        var currentPage = currentPath.split('/').pop() || 'Dashboard.html';
         
-        // Marcar estilos existentes
-        document.querySelectorAll('style[data-page-style]').forEach(style => {
-            existingStyleIds.add(style.getAttribute('data-style-id'));
-        });
+        var pageToKey = {
+            'Dashboard.html': 'dashboard',
+            'Conta.html': 'accounts',
+            'Transisao.html': 'transactions',
+            'Relatorio.html': 'reports', 
+            'Config.html': 'settings'
+        };
         
-        // Adicionar novos estilos
-        styles.forEach((style, index) => {
-            const styleId = `style-${this.currentPage}-${index}`;
-            
-            // Se o estilo já existe, remover primeiro
-            const existingStyle = document.querySelector(`[data-style-id="${styleId}"]`);
-            if (existingStyle) {
-                existingStyle.remove();
-            }
-            
-            // Criar novo elemento de estilo
-            const newStyle = document.createElement('style');
-            newStyle.setAttribute('data-page-style', 'true');
-            newStyle.setAttribute('data-style-id', styleId);
-            newStyle.textContent = style.textContent;
-            
-            document.head.appendChild(newStyle);
-        });
+        var currentPageKey = pageToKey[currentPage] || 'dashboard';
+        console.log('📍 Página atual: ' + currentPageKey);
         
-        // Limpar estilos antigos de outras páginas
-        document.querySelectorAll('style[data-page-style]').forEach(style => {
-            if (!style.getAttribute('data-style-id').includes(this.currentPage)) {
-                // Manter apenas por segurança, não remover
-                // style.remove();
-            }
+        var menuItems = document.querySelectorAll('.menu-item[data-page]');
+        menuItems.forEach(function(item) {
+            var isActive = item.getAttribute('data-page') === currentPageKey;
+            item.classList.toggle('active', isActive);
         });
     }
-    
-    reapplyScripts(page) {
-        // Reaplicar listeners comuns
-        this.reapplyCommonListeners();
-        
-        // Reaplicar scripts específicos da página
-        switch(page) {
-            case 'dashboard':
-                this.initDashboardScripts();
-                break;
-            case 'accounts':
-                this.initAccountsScripts();
-                break;
-            case 'transactions':
-                this.initTransactionsScripts();
-                break;
-            case 'reports':
-                this.initReportsScripts();
-                break;
-            case 'settings':
-                this.initSettingsScripts();
-                break;
-        }
-    }
-    
-    reapplyCommonListeners() {
-        // Logout button
-        const logoutBtn = document.querySelector('.logout-btn');
+
+    // 3. Configurar logout
+    function setupLogoutListener() {
+        var logoutBtn = document.querySelector('.logout-btn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 if (confirm('Tem certeza que deseja sair?')) {
                     alert('Você foi desconectado com sucesso!');
                 }
             });
         }
-        
-        // Menu mobile
-        const menuToggle = document.querySelector('.menu-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.overlay');
-        
-        if (menuToggle && sidebar && overlay) {
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            });
-            
-            overlay.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-        }
     }
-    
-    initDashboardScripts() {
-        console.log('Dashboard scripts initialized');
-        // Adicione aqui scripts específicos do Dashboard
-    }
-    
-    initAccountsScripts() {
-        console.log('Accounts scripts initialized');
-        // Adicione aqui scripts específicos de Contas
-    }
-    
-    initTransactionsScripts() {
-        console.log('Transactions scripts initialized');
-        // Adicione aqui scripts específicos de Transações
-    }
-    
-    initReportsScripts() {
-        console.log('Reports scripts initialized');
-        // Adicione aqui scripts específicos de Relatórios
-    }
-    
-    initSettingsScripts() {
-        console.log('Settings scripts initialized');
-        // Adicione aqui scripts específicos de Configurações
-    }
-    
-    updateActiveMenu(page) {
-        const menuItems = document.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('data-page') === page) {
-                item.classList.add('active');
-            }
-        });
-    }
-    
-    showLoading() {
-        let loader = document.getElementById('page-loader');
-        if (!loader) {
-            loader = document.createElement('div');
-            loader.id = 'page-loader';
-            loader.innerHTML = `
-                <div class="loading-overlay">
-                    <div class="loading-spinner"></div>
-                    <p>Carregando...</p>
-                </div>
-            `;
-            document.body.appendChild(loader);
-        }
-        loader.style.display = 'flex';
-    }
-    
-    hideLoading() {
-        const loader = document.getElementById('page-loader');
-        if (loader) loader.style.display = 'none';
-    }
-}
 
-// Inicializar navegação
-document.addEventListener('DOMContentLoaded', () => {
-    window.navigation = new NavigationSystem();
+    // 4. Configurar menu mobile
+    function setupMobileMenu() {
+        var menuToggle = document.querySelector('.menu-toggle');
+        var sidebar = document.querySelector('.sidebar');
+        var overlay = document.querySelector('.overlay');
+
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                if (overlay) overlay.classList.toggle('active');
+            });
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+        }
+    }
+
+    // 5. Mostrar loading
+    function showLoading() {
+        // Remover loader existente
+        var existingLoader = document.getElementById('page-loader');
+        if (existingLoader) {
+            existingLoader.remove();
+        }
+
+        var loader = document.createElement('div');
+        loader.id = 'page-loader';
+        loader.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 0; 
+                left: 0;
+                width: 100%; 
+                height: 100%;
+                background: rgba(255,255,255,0.95);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                font-family: 'Segoe UI', sans-serif;
+            ">
+                <div style="
+                    text-align: center;
+                    background: white;
+                    padding: 3rem;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                    border: 2px solid #1a237e;
+                ">
+                    <div style="
+                        width: 60px; 
+                        height: 60px;
+                        border: 4px solid #f3f3f3;
+                        border-top: 4px solid #1a237e;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 1.5rem;
+                    "></div>
+                    <h3 style="color: #1a237e; margin-bottom: 0.5rem;">Aurum Bank</h3>
+                    <p style="color: #666; margin: 0;">Carregando...</p>
+                </div>
+            </div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        `;
+        document.body.appendChild(loader);
+
+        // Auto-remover após 5 segundos (segurança)
+        setTimeout(function() {
+            var loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.remove();
+            }
+        }, 5000);
+    }
+
+    // Inicializar tudo
+    setupMenuListeners();
+    updateActiveMenu();
+    setupLogoutListener();
+    setupMobileMenu();
+
+    console.log('✅ Sistema de navegação configurado!');
 });
+
+// Fallback para caso o DOM já esteja carregado
+if (document.readyState !== 'loading') {
+    var event = new Event('DOMContentLoaded');
+    document.dispatchEvent(event);
+}
