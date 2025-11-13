@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contas - Aurum Bank</title>
     <style>
-        :root {
-            --primary: #1a237e;
-            --secondary: #ffd700;
-            --success: #4caf50;
-            --danger: #f44336;
-            --background: #f8f9fa;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-        }
+       :root {
+  --sidebar-width: 240px;
+  --primary: #2f3ebc;
+  --danger: #e53935;
+  --success: #4caf50;
+}
+
         
         * {
             margin: 0;
@@ -28,83 +26,122 @@
             transition: all 0.3s ease;
         }
         
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--primary);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-        
-        .sidebar.collapsed .logo h1,
-        .sidebar.collapsed .menu-item span {
-            display: none;
-        }
-        
-        .logo {
-            padding: 2rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid #283593;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .logo h1 {
-            font-size: 1.5rem;
-            transition: opacity 0.3s;
-        }
-        
-        .logo span {
-            color: var(--secondary);
-        }
-        
-        .menu-toggle {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: none;
-        }
-        
-        .menu {
-            padding: 1rem 0;
-        }
-        
-        .menu-item {
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .menu-item:hover {
-            background: #283593;
-        }
-        
-        .menu-item.active {
-            background: #283593;
-            border-left: 4px solid var(--secondary);
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            width: calc(100% - var(--sidebar-width));
-            transition: all 0.3s ease;
-        }
+/* === MENU === */
+.menu {
+  padding: 1rem 0;
+}
+
+.menu-item {
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ccc;
+  border-left: 4px solid transparent;
+}
+
+.menu-item:hover {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.menu-item.active {
+  background: #2f3ebc; /* azul do item ativo */
+  color: #fff;
+}
+
+.menu-item span:first-child {
+  font-size: 1.2rem;
+}
+
+/* === AJUSTES GERAIS === */
+.menu-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: none;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 260px;
+  background: #151515; /* fundo preto intenso */
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #1f1f1f;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.51);
+}
+/* ===== LOGO ===== */
+.logo {
+  padding: 2.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+.logo-img {
+  width: 70px;
+  height: auto;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.6)); /* opcional: brilho dourado */
+}
+
+/* Menu */
+/* Ítens do menu */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  color: #e0e0e0;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-left: 4px solid transparent;
+}
+
+.menu-item span:first-child {
+  font-size: 1.3rem; /* tamanho do emoji/ícone */
+}
+
+
+/* Ícones */
+.menu-item span:first-child {
+  font-size: 18px; /* mantendo emoji */
+}
+
+/* Hover padrão */
+.menu-item:hover {
+  background: #222;
+  color: #ffffff;
+}
+
+/* Ítem ativo */
+.menu-item.active {
+  background: #2f3ebc; /* azul destaque */
+  color: #fff;
+  border-left: 4px solid #2f3ebc;
+}
+
+/* ===== Main Content Shift ===== */
+.main-content {
+  margin-left: 460px; /* largura da sidebar */
+  padding: 40px 100px; /* espaçamento interno */
+  background: #fff;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
         
         .main-content.expanded {
             margin-left: var(--sidebar-collapsed-width);
@@ -429,105 +466,13 @@
             margin-bottom: 1rem;
             color: #333;
         }
-        
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: var(--sidebar-collapsed-width);
-            }
-            
-            .sidebar .logo h1,
-            .sidebar .menu-item span {
-                display: none;
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-collapsed-width);
-                width: calc(100% - var(--sidebar-collapsed-width));
-            }
-            
-            .menu-toggle {
-                display: block;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .header, .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .user-menu {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-                width: var(--sidebar-width);
-            }
-            
-            .sidebar.active .logo h1,
-            .sidebar.active .menu-item span {
-                display: block;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-                display: none;
-            }
-            
-            .overlay.active {
-                display: block;
-            }
-            
-            .accounts-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-filters {
-                flex-direction: column;
-            }
-            
-            .search-box {
-                min-width: 100%;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .account-actions {
-                flex-direction: column;
-            }
-            
-            .modal-content {
-                padding: 1.5rem;
-                width: 95%;
-            }
-        }
     </style>
 
     <!-- Sistema de Navegação -->
     <link rel="stylesheet" href="navigation.css">
-    <script src="navigation.js"></script>
+  <script src="js/navigation.js"></script>
+<script src="js/script.js"></script>
+
 
 </head>
 <body>
@@ -537,36 +482,33 @@
     <!-- Notification -->
     <div class="notification" id="notification"></div>
     
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <h1>Aur<span>um</span> Bank</h1>
-            <button class="menu-toggle">☰</button>
-        </div>
-        
-        <div class="menu">
-            <div class="menu-item" data-page="dashboard">
-                <span>📊</span>
-                <span>Dashboard</span>
-            </div>
-            <div class="menu-item active" data-page="accounts">
-                <span>💳</span>
-                <span>Contas</span>
-            </div>
-            <div class="menu-item" data-page="transactions">
-                <span>💸</span>
-                <span>Transações</span>
-            </div>
-            <div class="menu-item" data-page="reports">
-                <span>📊</span>
-                <span>Relatórios</span>
-            </div>
-            <div class="menu-item" data-page="settings">
-                <span>⚙️</span>
-                <span>Configurações</span>
-            </div>
-        </div>
+<!-- Sidebar -->
+<aside class="sidebar">
+
+  <div class="logo">
+    <img src="imgs/logo.png" alt="Logo Aurum" class="logo-img">
+  </div>
+
+  <nav class="menu">
+    <div class="menu-item" data-page="dashboard">
+      <span>📊</span><span>Dashboard</span>
     </div>
+    <div class="menu-item active" data-page="accounts">
+      <span>💳</span><span>Contas</span>
+    </div>
+    <div class="menu-item" data-page="transactions">
+      <span>💸</span><span>Transações</span>
+    </div>
+    <div class="menu-item" data-page="reports">
+      <span>📈</span><span>Relatórios</span>
+    </div>
+    <div class="menu-item" data-page="settings">
+      <span>⚙️</span><span>Configurações</span>
+    </div>
+  </nav>
+
+</aside>
+
     
     <!-- Main Content -->
     <div class="main-content">
@@ -722,240 +664,5 @@
             </form>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Menu toggle functionality
-            const menuToggle = document.querySelector('.menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
-            const overlay = document.querySelector('.overlay');
-            
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            });
-            
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-            
-            // Menu navigation
-            const menuItems = document.querySelectorAll('.menu-item');
-            
-            menuItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    // Remove active class from all menu items
-                    menuItems.forEach(i => i.classList.remove('active'));
-                    
-                    // Add active class to clicked menu item
-                    this.classList.add('active');
-                    
-                    // In a real application, you would navigate to the selected page
-                    const page = this.getAttribute('data-page');
-                    if (page !== 'accounts') {
-                        alert(`Navegando para a página: ${page}`);
-                        // window.location.href = `${page}.html`;
-                    }
-                    
-                    // Close sidebar on mobile after selection
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('active');
-                        overlay.classList.remove('active');
-                    }
-                });
-            });
-            
-            // Logout button functionality
-            const logoutBtn = document.querySelector('.logout-btn');
-            
-            logoutBtn.addEventListener('click', function() {
-                if (confirm('Tem certeza que deseja sair?')) {
-                    alert('Você foi desconectado com sucesso!');
-                    // In a real application, you would redirect to login page
-                    // window.location.href = 'login.html';
-                }
-            });
-            
-            // Modal functionality
-            const modal = document.getElementById('account-modal');
-            const btnNovaConta = document.getElementById('btn-nova-conta');
-            const closeModal = document.querySelector('.close-modal');
-            const btnCancel = document.querySelector('.btn-cancel');
-            const accountForm = document.getElementById('account-form');
-            const modalTitle = document.getElementById('modal-title');
-            
-            // Open modal for new account
-            btnNovaConta.addEventListener('click', function() {
-                modalTitle.textContent = 'Nova Conta';
-                accountForm.reset();
-                document.getElementById('account-id').value = '';
-                modal.classList.add('active');
-            });
-            
-            // Close modal
-            function closeAccountModal() {
-                modal.classList.remove('active');
-            }
-            
-            closeModal.addEventListener('click', closeAccountModal);
-            btnCancel.addEventListener('click', closeAccountModal);
-            
-            // Edit account buttons
-            const editButtons = document.querySelectorAll('.btn-edit');
-            
-            editButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const accountId = this.getAttribute('data-id');
-                    const accountCard = this.closest('.account-card');
-                    
-                    // In a real app, you would fetch account data from an API
-                    // For demo purposes, we'll use the data from the card
-                    modalTitle.textContent = 'Editar Conta';
-                    document.getElementById('account-id').value = accountId;
-                    document.getElementById('account-name').value = accountCard.querySelector('h3').textContent;
-                    
-                    // Extract balance (remove R$ and commas)
-                    const balanceText = accountCard.querySelector('.balance-amount').textContent;
-                    const balanceValue = balanceText.replace('R$', '').replace('.', '').replace(',', '.').trim();
-                    document.getElementById('account-balance').value = parseFloat(balanceValue);
-                    
-                    // Set account type and bank from data attributes
-                    document.getElementById('account-type').value = accountCard.getAttribute('data-type');
-                    document.getElementById('account-bank').value = accountCard.getAttribute('data-bank');
-                    
-                    modal.classList.add('active');
-                });
-            });
-            
-            // Delete account buttons
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const accountId = this.getAttribute('data-id');
-                    const accountName = this.closest('.account-card').querySelector('h3').textContent;
-                    
-                    if (confirm(`Tem certeza que deseja excluir a conta "${accountName}"?`)) {
-                        // In a real app, you would send a DELETE request to an API
-                        showNotification(`Conta "${accountName}" excluída com sucesso!`, 'success');
-                        
-                        // For demo purposes, we'll just remove the card from the DOM
-                        this.closest('.account-card').style.opacity = '0';
-                        setTimeout(() => {
-                            this.closest('.account-card').remove();
-                            checkEmptyState();
-                        }, 300);
-                    }
-                });
-            });
-            
-            // Form submission
-            accountForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const accountId = document.getElementById('account-id').value;
-                const accountName = document.getElementById('account-name').value;
-                const accountType = document.getElementById('account-type').value;
-                const accountBank = document.getElementById('account-bank').value;
-                const accountBalance = document.getElementById('account-balance').value;
-                
-                // In a real app, you would send this data to an API
-                if (accountId) {
-                    // Update existing account
-                    showNotification(`Conta "${accountName}" atualizada com sucesso!`, 'success');
-                } else {
-                    // Create new account
-                    showNotification(`Conta "${accountName}" criada com sucesso!`, 'success');
-                }
-                
-                closeAccountModal();
-            });
-            
-            // Search and filter functionality
-            const searchInput = document.getElementById('search-accounts');
-            const filterType = document.getElementById('filter-type');
-            const filterBank = document.getElementById('filter-bank');
-            const accountsContainer = document.getElementById('accounts-container');
-            const emptyState = document.getElementById('empty-state');
-            const btnResetFilters = document.getElementById('btn-reset-filters');
-            
-            function filterAccounts() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const typeFilter = filterType.value;
-                const bankFilter = filterBank.value;
-                
-                const accountCards = accountsContainer.querySelectorAll('.account-card');
-                let visibleCount = 0;
-                
-                accountCards.forEach(card => {
-                    const accountName = card.querySelector('h3').textContent.toLowerCase();
-                    const accountType = card.getAttribute('data-type');
-                    const accountBank = card.getAttribute('data-bank');
-                    
-                    const matchesSearch = accountName.includes(searchTerm);
-                    const matchesType = !typeFilter || accountType === typeFilter;
-                    const matchesBank = !bankFilter || accountBank === bankFilter;
-                    
-                    if (matchesSearch && matchesType && matchesBank) {
-                        card.style.display = 'block';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                checkEmptyState(visibleCount);
-            }
-            
-            function checkEmptyState(visibleCount) {
-                const accountCards = accountsContainer.querySelectorAll('.account-card');
-                const actualVisibleCount = visibleCount !== undefined ? 
-                    visibleCount : 
-                    Array.from(accountCards).filter(card => card.style.display !== 'none').length;
-                
-                if (actualVisibleCount === 0) {
-                    emptyState.style.display = 'block';
-                    accountsContainer.style.display = 'none';
-                } else {
-                    emptyState.style.display = 'none';
-                    accountsContainer.style.display = 'grid';
-                }
-            }
-            
-            searchInput.addEventListener('input', filterAccounts);
-            filterType.addEventListener('change', filterAccounts);
-            filterBank.addEventListener('change', filterAccounts);
-            
-            btnResetFilters.addEventListener('click', function() {
-                searchInput.value = '';
-                filterType.value = '';
-                filterBank.value = '';
-                filterAccounts();
-            });
-            
-            // Notification function
-            function showNotification(message, type) {
-                const notification = document.getElementById('notification');
-                notification.textContent = message;
-                notification.className = `notification ${type} show`;
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Responsive adjustments
-            function handleResize() {
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            }
-       a     
-            window.addEventListener('resize', handleResize);
-        });
-    </script>
 </body>
 </html>

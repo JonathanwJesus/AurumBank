@@ -29,39 +29,42 @@
         }
         
         /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--primary);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
+   .sidebar {
+    width: var(--sidebar-width);
+    background: #111;
+    color: #fff;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* garante que o menu venha logo após o logo */
+    align-items: center;
+    overflow-y: auto;
+    padding-top: 1rem;
+    transition: all 0.3s ease;
+}
+
         
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
+   .logo {
+    width: 100%;
+    padding: 1rem 0 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px solid #222;
+}
+
+.logo img {
+    width: 80px;       /* reduzi para um tamanho equilibrado */
+    height: auto;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 4px gold);
+}
+
         
-        .sidebar.collapsed .logo h1,
-        .sidebar.collapsed .menu-item span {
-            display: none;
-        }
-        
-        .logo {
-            padding: 2rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid #283593;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .logo h1 {
-            font-size: 1.5rem;
-            transition: opacity 0.3s;
-        }
+       .logo h1 {
+    display: none; /* oculta o texto "Aurum Bank" */
+}
         
         .logo span {
             color: var(--secondary);
@@ -76,27 +79,44 @@
             display: none;
         }
         
-        .menu {
-            padding: 1rem 0;
-        }
+       .menu {
+    width: 100%;
+    padding-top: 1rem;
+}
         
-        .menu-item {
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+       .menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
         
-        .menu-item:hover {
-            background: #283593;
-        }
+       /* hover e ativo */
+.menu-item:hover {
+    background: #2f2f2f;
+}
         
         .menu-item.active {
-            background: #283593;
-            border-left: 4px solid var(--secondary);
-        }
+    background: #3949ab; /* azul igual ao da imagem */
+}
+
+.menu-item + .menu-item {
+    margin-top: 0.3rem;
+}
+
+/* Ícones coloridos (como no modelo) */
+.menu-item[data-page="dashboard"] span:first-child { color: #8ab4f8; }
+.menu-item[data-page="accounts"] span:first-child { color: #4fc3f7; }
+.menu-item[data-page="transactions"] span:first-child { color: #81c784; }
+.menu-item[data-page="reports"] span:first-child { color: #ba68c8; }
+.menu-item[data-page="settings"] span:first-child { color: #ce93d8; }
+
         
         /* Main Content */
         .main-content {
@@ -370,100 +390,12 @@
             color: #333;
         }
         
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: var(--sidebar-collapsed-width);
-            }
-            
-            .sidebar .logo h1,
-            .sidebar .menu-item span {
-                display: none;
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-collapsed-width);
-                width: calc(100% - var(--sidebar-collapsed-width));
-            }
-            
-            .menu-toggle {
-                display: block;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .user-menu {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-                width: var(--sidebar-width);
-            }
-            
-            .sidebar.active .logo h1,
-            .sidebar.active .menu-item span {
-                display: block;
-            }
-            
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 999;
-                display: none;
-            }
-            
-            .overlay.active {
-                display: block;
-            }
-            
-            .search-filters {
-                grid-template-columns: 1fr;
-            }
-            
-            .summary-cards {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .summary-value {
-                font-size: 1.5rem;
-            }
-        }
     </style>
 
    <!-- Sistema de Navegação -->
     <link rel="stylesheet" href="navigation.css">
-    <script src="navigation.js"></script>
+    <script src="js/navigation.js"></script>
+
 
 </head>
 <body>
@@ -476,9 +408,8 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
-            <h1>Aur<span>um</span> Bank</h1>
-            <button class="menu-toggle">☰</button>
-        </div>
+    <img src="imgs/logo.png" alt="Aurum Logo">
+</div>
         
         <div class="menu">
             <div class="menu-item" data-page="dashboard">
@@ -676,242 +607,5 @@
             <p>Não há transações correspondentes aos filtros aplicados.</p>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Menu toggle functionality
-            const menuToggle = document.querySelector('.menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
-            const overlay = document.querySelector('.overlay');
-            
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            });
-            
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-            
-            // Menu navigation
-            const menuItems = document.querySelectorAll('.menu-item');
-            
-            menuItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    // Remove active class from all menu items
-                    menuItems.forEach(i => i.classList.remove('active'));
-                    
-                    // Add active class to clicked menu item
-                    this.classList.add('active');
-                    
-                    // In a real application, you would navigate to the selected page
-                    const page = this.getAttribute('data-page');
-                    if (page !== 'transactions') {
-                        alert(`Navegando para a página: ${page}`);
-                        // window.location.href = `${page}.html`;
-                    }
-                    
-                    // Close sidebar on mobile after selection
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('active');
-                        overlay.classList.remove('active');
-                    }
-                });
-            });
-            
-            // Logout button functionality
-            const logoutBtn = document.querySelector('.logout-btn');
-            
-            logoutBtn.addEventListener('click', function() {
-                if (confirm('Tem certeza que deseja sair?')) {
-                    alert('Você foi desconectado com sucesso!');
-                    // In a real application, you would redirect to login page
-                    // window.location.href = 'login.html';
-                }
-            });
-            
-            // Table sorting functionality
-            const tableHeaders = document.querySelectorAll('th.sortable');
-            let currentSort = { column: 'date', direction: 'asc' };
-            
-            tableHeaders.forEach(header => {
-                header.addEventListener('click', function() {
-                    const column = this.getAttribute('data-sort');
-                    
-                    // Remove previous sort indicators
-                    tableHeaders.forEach(h => {
-                        h.classList.remove('sorted-asc', 'sorted-desc');
-                    });
-                    
-                    // Toggle sort direction if same column
-                    if (currentSort.column === column) {
-                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        currentSort.column = column;
-                        currentSort.direction = 'asc';
-                    }
-                    
-                    // Add sort indicator
-                    this.classList.add(currentSort.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
-                    
-                    // Sort table
-                    sortTable(column, currentSort.direction);
-                    showNotification(`Tabela ordenada por ${getColumnName(column)} (${currentSort.direction === 'asc' ? 'crescente' : 'decrescente'})`, 'info');
-                });
-            });
-            
-            function sortTable(column, direction) {
-                const table = document.getElementById('transactions-table');
-                const tbody = table.querySelector('tbody');
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                
-                rows.sort((a, b) => {
-                    const aValue = a.cells[getColumnIndex(column)].textContent;
-                    const bValue = b.cells[getColumnIndex(column)].textContent;
-                    
-                    let comparison = 0;
-                    
-                    if (column === 'amount') {
-                        // Sort by numeric value for amounts
-                        const aNum = parseFloat(aValue.replace('R$', '').replace('.', '').replace(',', '.').replace('+', '').replace('-', ''));
-                        const bNum = parseFloat(bValue.replace('R$', '').replace('.', '').replace(',', '.').replace('+', '').replace('-', ''));
-                        
-                        // Consider negative values for expenses
-                        const aIsNegative = aValue.includes('-');
-                        const bIsNegative = bValue.includes('-');
-                        
-                        const aFinal = aIsNegative ? -aNum : aNum;
-                        const bFinal = bIsNegative ? -bNum : bNum;
-                        
-                        comparison = aFinal - bFinal;
-                    } else if (column === 'date') {
-                        // Sort by date
-                        const [aDay, aMonth, aYear] = aValue.split('/');
-                        const [bDay, bMonth, bYear] = bValue.split('/');
-                        const aDate = new Date(aYear, aMonth - 1, aDay);
-                        const bDate = new Date(bYear, bMonth - 1, bDay);
-                        comparison = aDate - bDate;
-                    } else {
-                        // Sort by text
-                        comparison = aValue.localeCompare(bValue);
-                    }
-                    
-                    return direction === 'asc' ? comparison : -comparison;
-                });
-                
-                // Remove existing rows
-                while (tbody.firstChild) {
-                    tbody.removeChild(tbody.firstChild);
-                }
-                
-                // Add sorted rows
-                rows.forEach(row => tbody.appendChild(row));
-            }
-            
-            function getColumnIndex(column) {
-                const headers = document.querySelectorAll('th');
-                for (let i = 0; i < headers.length; i++) {
-                    if (headers[i].getAttribute('data-sort') === column) {
-                        return i;
-                    }
-                }
-                return 0;
-            }
-            
-            function getColumnName(column) {
-                const names = {
-                    'date': 'Data',
-                    'description': 'Descrição',
-                    'category': 'Categoria',
-                    'type': 'Tipo',
-                    'amount': 'Valor',
-                    'account': 'Conta'
-                };
-                return names[column] || column;
-            }
-            
-            // Search and filter functionality
-            const searchInput = document.getElementById('search-transactions');
-            const periodFilter = document.getElementById('period-filter');
-            const categoryFilter = document.getElementById('category-filter');
-            const typeFilter = document.getElementById('type-filter');
-            const transactionsBody = document.getElementById('transactions-body');
-            const emptyState = document.getElementById('empty-state');
-            
-            function filterTransactions() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const periodValue = periodFilter.value;
-                const categoryValue = categoryFilter.value;
-                const typeValue = typeFilter.value;
-                
-                const transactions = transactionsBody.querySelectorAll('tr');
-                let visibleCount = 0;
-                
-                transactions.forEach(transaction => {
-                    const description = transaction.cells[1].textContent.toLowerCase();
-                    const category = transaction.cells[2].textContent.toLowerCase();
-                    const type = transaction.cells[3].textContent.toLowerCase();
-                    
-                    const matchesSearch = description.includes(searchTerm);
-                    const matchesCategory = !categoryValue || category.includes(categoryValue);
-                    const matchesType = !typeValue || 
-                        (typeValue === 'receita' && type.includes('receita')) ||
-                        (typeValue === 'despesa' && type.includes('despesa'));
-                    
-                    if (matchesSearch && matchesCategory && matchesType) {
-                        transaction.style.display = '';
-                        visibleCount++;
-                    } else {
-                        transaction.style.display = 'none';
-                    }
-                });
-                
-                checkEmptyState(visibleCount);
-            }
-            
-            function checkEmptyState(visibleCount) {
-                const transactions = transactionsBody.querySelectorAll('tr');
-                const actualVisibleCount = visibleCount !== undefined ? 
-                    visibleCount : 
-                    Array.from(transactions).filter(tr => tr.style.display !== 'none').length;
-                
-                if (actualVisibleCount === 0) {
-                    emptyState.style.display = 'block';
-                    document.querySelector('.table-container').style.display = 'none';
-                } else {
-                    emptyState.style.display = 'none';
-                    document.querySelector('.table-container').style.display = 'block';
-                }
-            }
-            
-            searchInput.addEventListener('input', filterTransactions);
-            periodFilter.addEventListener('change', filterTransactions);
-            categoryFilter.addEventListener('change', filterTransactions);
-            typeFilter.addEventListener('change', filterTransactions);
-            
-            // Notification function
-            function showNotification(message, type) {
-                const notification = document.getElementById('notification');
-                notification.textContent = message;
-                notification.className = `notification ${type} show`;
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Responsive adjustments
-            function handleResize() {
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            }
-            
-            window.addEventListener('resize', handleResize);
-        });
-    </script>
 </body>
 </html>

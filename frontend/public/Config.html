@@ -6,8 +6,8 @@
     <title>Configurações - Aurum Bank</title>
     <style>
         /* Estilos base (iguais aos anteriores) */
-        :root {
-            --primary: #1a237e;
+         :root {
+            --primary: #000000e5;
             --secondary: #ffd700;
             --success: #4caf50;
             --danger: #f44336;
@@ -29,16 +29,18 @@
             transition: all 0.3s ease;
         }
         
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--primary);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
+ .sidebar {
+  width: 260px;
+  background-color: #000; /* fundo preto puro */
+  color: white;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-right: 1px solid #1c1c1c;
+}
         
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
@@ -50,15 +52,22 @@
         }
         
         .logo {
-            padding: 2rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid #283593;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+  padding: 2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #1c1c1c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 70px;
+  height: auto;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.6));
+}
+
         
-        .logo h1 {
+      .logo h1 {
             font-size: 1.5rem;
             transition: opacity 0.3s;
         }
@@ -80,23 +89,26 @@
             padding: 1rem 0;
         }
         
-        .menu-item {
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+   .menu-item {
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
         
-        .menu-item:hover {
-            background: #283593;
+          .menu-item:hover {
+            background: #2a2a2a;
         }
-        
-        .menu-item.active {
-            background: #283593;
-            border-left: 4px solid var(--secondary);
-        }
+       
+          .menu-item.active { background: #2f3ebc; /* azul do item ativo */
+        color: #fff;
+
+}
         
         .main-content {
             margin-left: var(--sidebar-width);
@@ -430,7 +442,8 @@
     
     <!-- Sistema de Navegação -->
     <link rel="stylesheet" href="navigation.css">
-    <script src="navigation.js"></script>
+  <script src="js/navigation.js"></script>
+
 
 </head>
 
@@ -445,8 +458,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
-            <h1>Aur<span>um</span> Bank</h1>
-            <button class="menu-toggle">☰</button>
+          <img src="imgs/logo.png" alt="Aurum Log">
         </div>
         
         <div class="menu">
@@ -539,79 +551,6 @@
                         <input type="password" id="confirmar-senha" placeholder="Confirme a nova senha">
                         <button class="toggle-icon" data-target="confirmar-senha">👁️</button>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Preferências -->
-            <div class="settings-section">
-                <h3>🎨 Preferências</h3>
-                
-                <div class="form-group">
-                    <label>Tema</label>
-                    <div class="theme-selector">
-                        <div class="theme-option active" data-theme="light">
-                            <div class="theme-preview theme-light"></div>
-                            <span>Claro</span>
-                        </div>
-                        <div class="theme-option" data-theme="dark">
-                            <div class="theme-preview theme-dark"></div>
-                            <span>Escuro</span>
-                        </div>
-                        <div class="theme-option" data-theme="auto">
-                            <div class="theme-preview theme-auto"></div>
-                            <span>Automático</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Moeda Principal</label>
-                    <div class="currency-options">
-                        <div class="currency-option active" data-currency="BRL">
-                            <span>R$ BRL</span>
-                        </div>
-                        <div class="currency-option" data-currency="USD">
-                            <span>$ USD</span>
-                        </div>
-                        <div class="currency-option" data-currency="EUR">
-                            <span>€ EUR</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="idioma">Idioma</label>
-                    <select id="idioma">
-                        <option value="pt-BR" selected>Português (Brasil)</option>
-                        <option value="en-US">English (US)</option>
-                        <option value="es-ES">Español</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Notificações -->
-            <div class="settings-section">
-                <h3>🔔 Notificações</h3>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="notificacao-email" checked>
-                        Receber notificações por e-mail
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="notificacao-sms" checked>
-                        Receber notificações por SMS
-                    </label>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="notificacao-push">
-                        Receber notificações push
-                    </label>
                 </div>
             </div>
             
